@@ -1,0 +1,64 @@
+const livros = JSON.parse(localStorage.getItem('books')) || []
+
+function salvarLivros() {
+    localStorage.setItem('books', JSON.stringify(livros))
+}
+
+
+function addBook() {
+    const titulo = document.querySelector('#titulo')
+    const autor = document.querySelector('#autor')
+    const genero = document.querySelector('#genero')
+    const ano = document.querySelector('#ano')
+    const situacao = document.querySelector('#situacao')
+
+    const livro = {
+        titulo: titulo.value, 
+        autor: autor.value,
+        genero: genero.value,
+        ano: Number(ano.value),
+        situacao: situacao.value
+    }
+    livros.push(livro)
+    alert('Livro cadastrado com sucesso!')
+    
+    titulo.value = ''
+    autor.value = ''
+    genero.value = ''
+    ano.value = ''
+    situacao.value = ''
+    listarLivros(livros)
+    salvarLivros()
+}
+
+function listarLivros(catalogoLivros) {
+    const catalogo = document.querySelector('#catalogo')
+    catalogo.innerHTML = ''
+
+    for (const livro of catalogoLivros) {
+        const div = document.createElement('div')
+        div.classList.add('livro')
+        div.innerHTML = `<h3>${livro.titulo}</h3>
+                        <p>Autor: ${livro.autor}</p>
+                        <p>Genero: ${livro.genero}</p>
+                        <p>Ano: ${livro.ano}</p>
+                        <p>Situacao: ${livro.situacao}</p>`
+        catalogo.append(div)
+    }
+}
+
+function buscarLivro() {
+    const termo = document.querySelector('#termo-busca').value.toLowerCase()
+
+    const resultado = livros.filter(livro => livro.titulo.toLowerCase().includes(termo) || livro.autor.toLowerCase().includes(termo) || livro.genero.toLowerCase().includes(termo) || livro.ano.toString().includes(termo) || livro.situacao.toLowerCase().includes(termo))
+
+    if (resultado.length > 0) {
+        listarLivros(resultado)
+    }
+    else {
+        alert('Livro(s) não encontrado(s)!')
+        listarLivros(livros)
+    }
+}
+
+listarLivros(livros)
