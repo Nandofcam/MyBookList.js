@@ -4,29 +4,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo - Online</title>
+    <title>MyBookList</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Catálogo Online</h1>
+        <h1>MyBookList</h1>
         <div class="form-cadastro">
             <input type="text" id="titulo" placeholder="Título">
             <input type="text" id="autor" placeholder="Autor">
             <input type="text" id="genero" placeholder="Gênero">
             <input type="text" id="ano" placeholder="Ano">
+            <input type="number" id="preco" placeholder="Preço (R$)" min="0" step="0.01"> <!-- Permitir preços em centavos -->
+            <input type="number" id="quantidade" placeholder="Qtd. em estoque" min="0" step="1"> <!-- Permitir somente quantidades inteias -->
             <select name="Situação" id="situacao">
-                <option value="">Situação</option>
-                <option value="a comprar">A comprar</option>
-                <option value="comprado">Comprado</option>
-                <option value="lendo">Lendo</option>
-                <option value="lido">Lido</option>
+                <option value="Conservacao">Estado de conservação</option>
+                <option value="Novo">Novo - Lacrado</option>
+                <option value="Muito Bom">Muito bom - Pouquíssimos sinais de manuseio</option>
+                <option value="Bom">Bom - Sinais normais de uso, bem conservado</option>
+                <option value="Regular">Regular - Desgastes mais perceptíveis, mas em condições de leitura</option>
             </select>
             <button onclick="addBook()">Adicionar</button>
         </div>
 
         <div class="form-busca">
-            <input type="text" id="termo-busca" placeholder="Buscar por Título, Autor, Gênero, Ano ou Situação">
+            <input type="text" id="termo-busca" placeholder="Buscar por Título, Autor, Gênero, Ano ou Conservação">
             <button onclick="buscarLivro()">Busca</button>
         </div>
 
