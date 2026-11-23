@@ -1,39 +1,42 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyBookList</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+    <main class="container">
         <h1>MyBookList</h1>
-        <div class="form-cadastro">
-            <input type="text" id="titulo" placeholder="Título">
-            <input type="text" id="autor" placeholder="Autor">
-            <input type="text" id="genero" placeholder="Gênero">
-            <input type="text" id="ano" placeholder="Ano">
-            <input type="number" id="preco" placeholder="Preço (R$)" min="0" step="0.01"> <!-- Permitir preços em centavos -->
-            <input type="number" id="quantidade" placeholder="Qtd. em estoque" min="0" step="1"> <!-- Permitir somente quantidades inteias -->
-            <select name="Situação" id="situacao">
-                <option value="Conservacao">Estado de conservação</option>
+
+        <section class="form-cadastro" aria-label="Cadastro de livro">
+            <input type="text" id="titulo" placeholder="Título" aria-label="Título" required>
+            <input type="text" id="autor" placeholder="Autor" aria-label="Autor" required>
+            <input type="text" id="genero" placeholder="Gênero" aria-label="Gênero" required>
+            <input type="number" id="ano" placeholder="Ano" aria-label="Ano" min="1" max="9999" step="1" required>
+            <input type="number" id="preco" placeholder="Preço (R$)" aria-label="Preço (R$)" min="0" step="0.01" required>
+            <input type="number" id="quantidade" placeholder="Qtd. em estoque" aria-label="Quantidade em estoque" min="0" step="1" required>
+
+            <select id="situacao" name="situacao" aria-label="Estado de conservação" required>
+                <option value="" selected disabled>Estado de conservação</option>
                 <option value="Novo">Novo - Lacrado</option>
                 <option value="Muito Bom">Muito bom - Pouquíssimos sinais de manuseio</option>
                 <option value="Bom">Bom - Sinais normais de uso, bem conservado</option>
                 <option value="Regular">Regular - Desgastes mais perceptíveis, mas em condições de leitura</option>
             </select>
-            <button onclick="addBook()">Adicionar</button>
-        </div>
+            <button type="button" id="btn-adicionar">Adicionar</button>
+        </section>
 
-        <div class="form-busca">
-            <input type="text" id="termo-busca" placeholder="Buscar por Título, Autor, Gênero, Ano ou Conservação">
-            <button onclick="buscarLivro()">Busca</button>
-        </div>
+        <section class="form-busca" aria-label="Busca de livros">
+            <input type="search" id="termo-busca" placeholder="Buscar por título, autor, gênero, ano ou conservação" aria-label="Buscar livros">
+            <button type="button" id="btn-buscar">Buscar</button>
+            <button type="button" id="btn-limpar-busca" class="secondary">Mostrar todos</button>
+        </section>
 
+        <p id="mensagem" role="status" aria-live="polite"></p>
         <div id="catalogo"></div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
