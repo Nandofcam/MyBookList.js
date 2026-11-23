@@ -5,40 +5,103 @@
     font-family: Verdana, sans-serif;
 }
 
-.container, select {
+body {
+    background: #f7f7f7;
+    color: #222;
+    padding: 16px;
+}
+
+.container {
+    width: 100%;
     max-width: 800px;
     margin: 20px auto;
-    background-color: #f4f4f4;
+    background: #fff;
     border-radius: 8px;
     padding: 20px;
 }
 
 h1, h2 {
     text-align: center;
+    margin-bottom: 16px;
 }
 
 input, select, button {
-    width: calc(100% - 22px);
-    padding: 8px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bbb;
     border-radius: 8px;
-    font-size: 22px;
-    margin: 5px;
+    font-size: 16px;
+    margin: 5px 0;
 }
 
 button {
     cursor: pointer;
+    background: #2457a6;
+    color: white;
+    border: 0;
+    font-weight: 600;
+}
+
+button:hover:not(:disabled) {
+    background: #183e79;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+}
+
+button.secondary {
+    background: #666;
+}
+
+.form-cadastro, .form-busca {
+    margin-bottom: 16px;
+}
+
+#mensagem {
+    min-height: 1.4em;
+    margin: 10px 0;
+    color: #176b32;
+}
+
+#mensagem.erro {
+    color: #b00020;
 }
 
 #catalogo {
     margin-top: 20px;
 }
 
-.form-cadastro, .form-busca {
-    margin-bottom: 10px;
-}
-
 .livro {
     border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
+.livro h3 {
+    margin-bottom: 8px;
+}
+
+.livro p {
+    margin: 5px 0;
+}
+
+@media (min-width: 600px) {
+    .form-cadastro, .form-busca {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .form-cadastro input, .form-cadastro select,
+    .form-cadastro button, .form-busca input, .form-busca button {
+        margin: 0;
+    }
+
+    .form-cadastro button, .form-busca button {
+        grid-column: span 2;
+    }
 }
