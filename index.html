@@ -12,9 +12,9 @@
 
         <section class="form-cadastro" aria-label="Cadastro de livro">
             <input type="text" id="titulo" placeholder="Título" aria-label="Título" required>
-            <input type="text" id="autor" placeholder="Autor" aria-label="Autor" required>
+            <input type="text" id="autor" placeholder="Autor (opcional)" aria-label="Autor (opcional)">
             <input type="text" id="genero" placeholder="Gênero" aria-label="Gênero" required>
-            <input type="number" id="ano" placeholder="Ano" aria-label="Ano" min="1" max="9999" step="1" required>
+            <input type="number" id="ano" placeholder="Ano (opcional; negativo = a.C.)" aria-label="Ano (opcional; use número negativo para a.C.)" min="-9999" max="9999" step="1">
             <input type="number" id="preco" placeholder="Preço (R$)" aria-label="Preço (R$)" min="0" step="0.01" required>
             <input type="number" id="quantidade" placeholder="Qtd. em estoque" aria-label="Quantidade em estoque" min="0" step="1" required>
 
@@ -26,6 +26,7 @@
                 <option value="Regular">Regular - Desgastes mais perceptíveis, mas em condições de leitura</option>
             </select>
             <button type="button" id="btn-adicionar">Adicionar</button>
+            <button type="button" id="btn-cancelar-edicao" class="secondary" hidden>Cancelar edição</button>
         </section>
 
         <section class="form-busca" aria-label="Busca de livros">

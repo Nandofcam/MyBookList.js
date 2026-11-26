@@ -1,6 +1,9 @@
 'use strict';
 
 const STORAGE_KEY = 'books';
+const INDEFINIDO = 'Indefinido';
+
+let indiceEmEdicao = null;
 
 function carregarLivros() {
     try {
@@ -31,61 +34,147 @@ function mostrarMensagem(texto, erro = false) {
     mensagem.classList.toggle('erro', erro);
 }
 
+function formatarAno(ano) {
+    if (ano === null || ano === undefined || ano === '') {
+        return INDEFINIDO;
+    }
+    const numero = Number(ano);
+    if (!Number.isInteger(numero) || numero === 0) {
+        return INDEFINIDO;
+    }
+    return numero < 0 ? `${Math.abs(numero)} a.C.` : `${numero}`;
+}
+
+function formatarAutor(autor) {
+    const texto = String(autor ?? '').trim();
+    return texto || INDEFINIDO;
+}
+
 function valorCampo(id) {
     return document.querySelector(`#${id}`).value.trim();
 }
 
-function addBook() {
+function limparFormulario() {
+    ['titulo', 'autor', 'genero', 'ano', 'preco', 'quantidade', 'situacao'].forEach((id) => {
+        document.querySelector(`#${id}`).value = '';
+    });
+}
+
+function lerFormulario() {
     const titulo = valorCampo('titulo');
-    const autor = valorCampo('autor');
+    const autor = formatarAutor(valorCampo('autor'));
     const genero = valorCampo('genero');
     const anoTexto = valorCampo('ano');
     const precoTexto = valorCampo('preco');
     const quantidadeTexto = valorCampo('quantidade');
     const situacao = valorCampo('situacao');
 
-    const ano = Number(anoTexto);
     const preco = Number(precoTexto);
     const quantidade = Number(quantidadeTexto);
 
-    if (!titulo || !autor || !genero || !anoTexto || !precoTexto ||
-        !quantidadeTexto || !situacao) {
-        mostrarMensagem('Preencha todos os campos.', true);
-        return;
+    // Autor e ano são opcionais; os demais campos continuam obrigatórios.
+    if (!titulo || !genero || !precoTexto || !quantidadeTexto || !situacao) {
+        mostrarMensagem('Preencha título, gênero, preço, quantidade e conservação.', true);
+        return null;
     }
 
-    if (!Number.isInteger(ano) || ano < 1 || ano > 9999) {
-        mostrarMensagem('Informe um ano válido (de 1 a 9999).', true);
-        return;
+    // Ano em branco = indefinido (null). Negativo = a.C.
+    let ano = null;
+    if (anoTexto !== '') {
+        ano = Number(anoTexto);
+        if (!Number.isInteger(ano) || ano === 0 || ano < -9999 || ano > 9999) {
+            mostrarMensagem('Informe um ano válido (de 1 a 9999, ou negativo para a.C., ex.: -380), ou deixe em branco.', true);
+            return null;
+        }
     }
 
     if (!Number.isFinite(preco) || preco < 0) {
         mostrarMensagem('Informe um preço válido, igual ou maior que zero.', true);
-        return;
+        return null;
     }
 
     if (!Number.isInteger(quantidade) || quantidade < 0) {
         mostrarMensagem('A quantidade deve ser um número inteiro igual ou maior que zero.', true);
+        return null;
+    }
+
+    return { titulo, autor, genero, ano, preco, quantidade, situacao };
+}
+
+function addBook() {
+    const dados = lerFormulario();
+    if (!dados) return;
+
+    if (indiceEmEdicao !== null) {
+        salvarEdicao(dados);
         return;
     }
 
-    livros.push({ titulo, autor, genero, ano, preco, quantidade, situacao });
+    livros.push(dados);
 
     if (!salvarLivros()) {
         livros.pop();
         return;
     }
 
-    document.querySelector('#titulo').value = '';
-    document.querySelector('#autor').value = '';
-    document.querySelector('#genero').value = '';
-    document.querySelector('#ano').value = '';
-    document.querySelector('#preco').value = '';
-    document.querySelector('#quantidade').value = '';
-    document.querySelector('#situacao').value = '';
-
+    limparFormulario();
     listarLivros(livros);
     mostrarMensagem('Livro cadastrado com sucesso.');
+}
+
+function iniciarEdicao(indice) {
+    const livro = livros[indice];
+    if (!livro) {
+        mostrarMensagem('Livro não encontrado. Atualize a lista e tente novamente.', true);
+        listarLivros(livros);
+        return;
+    }
+
+    indiceEmEdicao = indice;
+
+    document.querySelector('#titulo').value = livro.titulo ?? '';
+    document.querySelector('#autor').value =
+        formatarAutor(livro.autor) === INDEFINIDO ? '' : livro.autor;
+    document.querySelector('#genero').value = livro.genero ?? '';
+    document.querySelector('#ano').value =
+        formatarAno(livro.ano) === INDEFINIDO ? '' : livro.ano;
+    document.querySelector('#preco').value = livro.preco ?? '';
+    document.querySelector('#quantidade').value = livro.quantidade ?? '';
+    document.querySelector('#situacao').value = livro.situacao ?? '';
+
+    document.querySelector('#btn-adicionar').textContent = 'Salvar alterações';
+    document.querySelector('#btn-cancelar-edicao').hidden = false;
+
+    document.querySelector('.form-cadastro').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    mostrarMensagem(`Editando "${livro.titulo}". Altere os campos e clique em "Salvar alterações".`);
+}
+
+function sairDoModoEdicao() {
+    indiceEmEdicao = null;
+    limparFormulario();
+    document.querySelector('#btn-adicionar').textContent = 'Adicionar';
+    document.querySelector('#btn-cancelar-edicao').hidden = true;
+}
+
+function salvarEdicao(dados) {
+    const anterior = livros[indiceEmEdicao];
+    if (!anterior) {
+        mostrarMensagem('Livro não encontrado.', true);
+        sairDoModoEdicao();
+        listarLivros(livros);
+        return;
+    }
+
+    livros[indiceEmEdicao] = dados;
+
+    if (!salvarLivros()) {
+        livros[indiceEmEdicao] = anterior;
+        return;
+    }
+
+    sairDoModoEdicao();
+    listarLivros(livros);
+    mostrarMensagem('Livro atualizado com sucesso.');
 }
 
 function criarTexto(tag, texto) {
@@ -109,9 +198,9 @@ function listarLivros(catalogoLivros = livros) {
         div.className = 'livro';
 
         div.append(criarTexto('h3', livro.titulo || 'Título não informado'));
-        div.append(criarTexto('p', `Autor: ${livro.autor || '—'}`));
+        div.append(criarTexto('p', `Autor: ${formatarAutor(livro.autor)}`));
         div.append(criarTexto('p', `Gênero: ${livro.genero || '—'}`));
-        div.append(criarTexto('p', `Ano: ${livro.ano ?? '—'}`));
+        div.append(criarTexto('p', `Ano: ${formatarAno(livro.ano)}`));
 
         const preco = Number(livro.preco ?? 0);
         div.append(criarTexto('p', `Preço: ${Number.isFinite(preco)
@@ -128,13 +217,18 @@ function listarLivros(catalogoLivros = livros) {
         botaoVenda.disabled = !Number.isInteger(quantidade) || quantidade <= 0;
         botaoVenda.addEventListener('click', () => registrarVenda(indice));
 
+        const botaoEditar = document.createElement('button');
+        botaoEditar.type = 'button';
+        botaoEditar.textContent = 'Editar';
+        botaoEditar.addEventListener('click', () => iniciarEdicao(indice));
+
         const botaoExcluir = document.createElement('button');
         botaoExcluir.type = 'button';
         botaoExcluir.className = 'secondary';
         botaoExcluir.textContent = 'Excluir';
         botaoExcluir.addEventListener('click', () => excluirLivro(indice));
 
-        div.append(botaoVenda, botaoExcluir);
+        div.append(botaoVenda, botaoEditar, botaoExcluir);
         catalogo.append(div);
     });
 }
@@ -150,7 +244,7 @@ function buscarLivro() {
 
     const resultado = livros.filter((livro) => {
         const campos = [
-            livro.titulo, livro.autor, livro.genero, livro.ano, livro.situacao
+            livro.titulo, formatarAutor(livro.autor), livro.genero, livro.ano, formatarAno(livro.ano), livro.situacao
         ];
         return campos.some((campo) =>
             String(campo ?? '').toLocaleLowerCase('pt-BR').includes(termo)
@@ -193,6 +287,9 @@ function registrarVenda(indice) {
 
     livro.quantidade = estoque - quantidadeVendida;
     if (salvarLivros()) {
+        if (indiceEmEdicao === indice) {
+            document.querySelector('#quantidade').value = livro.quantidade;
+        }
         listarLivros(livros);
         mostrarMensagem('Venda registrada e estoque atualizado.');
     }
@@ -209,6 +306,9 @@ function excluirLivro(indice) {
     if (confirm(`Deseja realmente excluir "${livro.titulo}"?`)) {
         const removido = livros.splice(indice, 1)[0];
         if (salvarLivros()) {
+            if (indiceEmEdicao !== null) {
+                sairDoModoEdicao();
+            }
             listarLivros(livros);
             mostrarMensagem('Livro excluído.');
         } else {
@@ -219,6 +319,10 @@ function excluirLivro(indice) {
 }
 
 document.querySelector('#btn-adicionar').addEventListener('click', addBook);
+document.querySelector('#btn-cancelar-edicao').addEventListener('click', () => {
+    sairDoModoEdicao();
+    mostrarMensagem('Edição cancelada.');
+});
 document.querySelector('#btn-buscar').addEventListener('click', buscarLivro);
 document.querySelector('#btn-limpar-busca').addEventListener('click', () => {
     document.querySelector('#termo-busca').value = '';
